@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { emit } from 'process';
-import { ZuAppResponse } from 'src/common/helpers/response';
+import { ZuAppResponse } from '../common/helpers/response';
 import { UserService } from '../user/user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+
 
 @Injectable()
 export class AuthService {

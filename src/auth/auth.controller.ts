@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Session } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Serialize } from 'src/intereptors/serialize.interceptor';
+import { Serialize } from '../intereptors/serialize.interceptor';
+import { ZuAppResponse } from '../common/helpers/response';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -19,6 +20,6 @@ export class AuthController {
         @Session() session: any
     ){
         const user = await this.authService.signup(body)
-        return user
+        return user 
     }
 }

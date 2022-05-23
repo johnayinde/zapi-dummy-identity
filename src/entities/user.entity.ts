@@ -1,13 +1,8 @@
-import { Injectable } from "@nestjs/common";
 import { BeforeInsert, Entity, Column, PrimaryGeneratedColumn, } from "typeorm";
 import { Exclude } from "class-transformer";
 import { randomBytes, pbkdf2Sync } from "crypto";
 import { SharedEntity } from "../common/model/sharedEntity";
 
-// @Injectable()
-// export class HashPassword{
-
-// }
 @Entity()
 export class User extends SharedEntity {
 
@@ -37,7 +32,6 @@ export class User extends SharedEntity {
 
     @BeforeInsert()
     public setPassword() {
-        console.log('before insert entity space')
         let salt = randomBytes(32).toString('hex')
         let hash = pbkdf2Sync(this.password, salt, 1000, 64, 'sha512').toString('hex')
         let hashedPassword = `${salt}:${hash}`

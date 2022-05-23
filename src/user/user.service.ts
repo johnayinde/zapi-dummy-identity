@@ -1,7 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {  Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
+import { ZuAppResponse } from '../common/helpers/response';
 import { UsersRepository } from '../databases/repository/user.repository';
 
 @Injectable()
@@ -17,13 +15,17 @@ export class UserService {
 
     findOne(id: string){
         if(!id){
-            return null
+            return ZuAppResponse.NotFoundRequest("Not found",'User not found')
         }
         const user = this.usersrepo.findOne(id)
         return user
     }
 
     async findByEmail(email: string){
-        return await  this.usersrepo.findOne({where:{email: email}})
+        if(!email) {
+            return ZuAppResponse.NotFoundRequest("Not found",'User not found')
+        }
+        const user = await  this.usersrepo.findOne({where:{email: email}})
+        return user
     }
 }
