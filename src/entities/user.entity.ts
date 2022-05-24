@@ -19,10 +19,7 @@ export class User extends SharedEntity {
     password: string
     
     @Column({nullable: true})
-    organization ?: string
-
-    @Column({nullable: true})
-    apis ?: string
+    profileID ?: string
 
     @Column({ unique: true, nullable: true })
     @Exclude()
