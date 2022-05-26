@@ -15,8 +15,7 @@ export class AuthController {
     @Post('/signup')
     @ApiOperation({description: 'Sign up a User'})
     async signUpUser(
-        @Body() body: CreateUserDto,
-        @Session() session: any
+        @Body() body: CreateUserDto
     ){
         const user = await this.authService.signup(body)
         return user 

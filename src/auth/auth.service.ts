@@ -1,21 +1,22 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { UsersRepository } from '../databases/repository/user.repository';
+import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
-import { UserService } from '../user/user.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private usersservice: UserService){}
+    constructor(private usersRepo: UsersRepository){}
 
-    async signup({fullName, email, password}){
-        const existingUser = await this.usersservice.findByEmail(email)
-        if(existingUser) {
+    async signup(user: CreateUserDto){
+        const userdata = Object.assign(new User(), user)
+        const newUser = await this.usersRepo.save(userdata).catch(e => {
+            console.log(e)
             throw new BadRequestException(
                 ZuAppResponse.BadRequest("Duplicate Values", "The Email already exists")
             )
-        }
-        const newUser = await this.usersservice.create(fullName, email, password)
-
+        })
         return newUser
     }
 }
