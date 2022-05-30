@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ZuAppResponse } from '../common/helpers/response';
-import { UsersRepository } from '../databases/repository/user.repository';
+import { UsersRepository } from '../database/repository/user.repository';
 import { User } from '../entities/user.entity';
 
 @Injectable()

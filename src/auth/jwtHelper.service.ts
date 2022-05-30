@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "../common/constants/jwt.constant";
 import { ZuAppResponse } from "../common/helpers/response";
-import { UsersRepository } from "../databases/repository/user.repository";
+import { UsersRepository } from "../database/repository/user.repository";
 
 @Injectable()
 export class JwtHelperService {

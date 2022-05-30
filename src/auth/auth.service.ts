@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsersRepository } from '../databases/repository/user.repository';
+import { UsersRepository } from '../database/repository/user.repository';
 import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
 import { CreateUserDto } from './dto/create-user.dto';
