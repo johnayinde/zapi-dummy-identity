@@ -28,6 +28,10 @@ import { UserModule } from './user/user.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
+        migrations: ["database/migration/**/*.ts"],
+        cli: {
+          "migrationsDir": "database/migrations"
+        }
       }),
       inject: [ConfigService],
     }),
