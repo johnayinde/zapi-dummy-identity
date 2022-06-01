@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsersRepository } from '../databases/repository/user.repository';
+import { UsersRepository } from '../database/repository/user.repository';
 import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { SignInDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtHelperService } from './jwtHelper.service';
 import { ConfigService } from '@nestjs/config';
-
 
 @Injectable()
 export class AuthService {

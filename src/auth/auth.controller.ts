@@ -2,22 +2,23 @@ import { Body, Controller, Post, Req, Session } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { SignInDto } from './dto/signin.dto';
-import { UserDto } from './dto/user.dto';
+import { UserDto } from '../user/dto/user.dto';
 import { Request } from 'express';
-
 
 @ApiTags("Auth-Users")
 @Controller('auth')
 @Serialize(UserDto)
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
+    constructor(
+        private readonly authService: AuthService,
+        ){}
 
     @Post('/signup')
     @ApiOperation({description: 'Sign up a User'})
     async signUpUser(
-        @Body() body: CreateUserDto
+        @Body() body: CreateUserDto,
     ){
         const user = await this.authService.signup(body)
         return user 

@@ -11,6 +11,8 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    AuthModule,
+    UserModule,
     ConfigModule.forRoot({ 
       isGlobal: true,
     }),
@@ -31,8 +33,6 @@ import { UserModule } from './user/user.module';
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
-    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
