@@ -11,6 +11,8 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    AuthModule,
+    UserModule,
     ConfigModule.forRoot({ 
       isGlobal: true,
     }),
@@ -28,15 +30,9 @@ import { UserModule } from './user/user.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
-        migrations: ["database/migration/**/*.ts"],
-        cli: {
-          "migrationsDir": "database/migrations"
-        }
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
-    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
 import { UsersRepository } from '../database/repository/user.repository';
-import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -28,5 +28,18 @@ export class UserService {
         }
         return user
     }
+
+    async update(id: string, attrs: Partial<User>){
+        const user = await this.usersrepo.findOne(id)
+        if (!user){
+            throw new NotFoundException(
+                ZuAppResponse.NotFoundRequest('user not found')
+            )
+        }
+        Object.assign(user, attrs)
+        const updatedUser = this.usersrepo.save(user)
+        return updatedUser
+    }
+
 
 }

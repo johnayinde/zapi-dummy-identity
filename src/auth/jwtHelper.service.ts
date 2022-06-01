@@ -20,7 +20,7 @@ export class JwtHelperService {
         })
     }
 
-    async signRefresh(payload: {useAgent: string, ipAddress: string, id: string}){
+    async signRefresh(payload: {userAgent: string, ipAddress: string, id: string}){
         let refreshToken = this.jwTokenService.sign(payload, {
             secret: await this.configService.get(jwtConstants.refresh_secret),
             expiresIn: await this.configService.get(jwtConstants.refresh_time)

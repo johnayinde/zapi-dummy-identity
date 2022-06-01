@@ -2,12 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../database/repository/user.repository';
 import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private usersRepo: UsersRepository){}
+    constructor(
+        private usersRepo: UsersRepository
+    ){}
 
     async signup(user: CreateUserDto){
         const userdata = Object.assign(new User(), user)
@@ -18,5 +20,5 @@ export class AuthService {
             )
         })
         return newUser
-    }
+    }   
 }
