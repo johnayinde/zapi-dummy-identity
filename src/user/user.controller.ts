@@ -2,9 +2,10 @@ import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Patch, 
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZuAppResponse } from '../common/helpers/response';
 import { UserDto } from '../user/dto/user.dto';
-import { Serialize } from '../intereptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+
 
 
 @ApiTags('Users')

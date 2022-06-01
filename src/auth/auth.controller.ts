@@ -1,9 +1,11 @@
-import { Body, Controller,  Post} from '@nestjs/common';
+import { Body, Controller, Post, Req, Session } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Serialize } from '../intereptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { SignInDto } from './dto/signin.dto';
 import { UserDto } from '../user/dto/user.dto';
+import { Request } from 'express';
 
 @ApiTags("Auth-Users")
 @Controller('auth')
@@ -20,5 +22,14 @@ export class AuthController {
     ){
         const user = await this.authService.signup(body)
         return user 
-    }   
+    }
+
+    @Post('/signin')
+    @ApiOperation({description: 'Sign in a User'})
+    async signInUser(
+        @Body() body: SignInDto,
+        @Req() req: Request
+    ){
+        return this.authService.signin(body, { userAgent: req.headers['user-agent'], ipAddress: req.ip })
+    }
 }
