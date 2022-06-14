@@ -6,12 +6,18 @@ import { UserModule } from '../user/user.module';
 import { UsersRepository } from '../database/repository/user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtHelperService } from './jwtHelper.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [ TypeOrmModule.forFeature([UsersRepository]), UserModule, JwtModule.register({
-    publicKey: 'PUBLIC_KEY',
-    privateKey: 'PRIVATE_KEY',
-  })],
+  imports: [ 
+    TypeOrmModule.forFeature([UsersRepository]), 
+    UserModule,
+    MailModule,
+    JwtModule.register({
+      publicKey: 'PUBLIC_KEY',
+      privateKey: 'PRIVATE_KEY',
+    }), 
+  ],
   controllers: [ AuthController],
   providers: [AuthService, JwtHelperService]
 })

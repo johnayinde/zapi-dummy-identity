@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, Next } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "../common/constants/jwt.constant";
@@ -60,5 +60,26 @@ export class JwtHelperService {
             )
         }
     }
-  
+
+
+    async forgotPassword(payload: {id:string, email: string }, password: string ){
+        const secretCombo = await this.configService.get(jwtConstants.reset_secret )+ password
+        return this.jwTokenService.sign(payload, {
+            secret: secretCombo,
+            expiresIn: await this.configService.get(jwtConstants.reset_time)
+        })
+    }
+    
+    async verifyResetToken(token: string, password: string){
+        const secretCombo = await this.configService.get(jwtConstants.reset_secret )+ password
+        try {
+            const payload =  await this.jwTokenService.verify(token, {secret: secretCombo})
+            return payload
+        } catch (error) {
+            throw new ForbiddenException(
+                ZuAppResponse.BadRequest(error.name, error.message, error.status)
+            )
+        } 
+      
+    }
 }

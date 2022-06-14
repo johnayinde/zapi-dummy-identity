@@ -5,5 +5,9 @@ export const configConstant = {
     username: 'DATABASE_USERNAME',
     password: 'DATABASE_PASSWORD',
     name: 'DATABASE_NAME',
+  },
+  httpModule: {
+    timeout: 'HTTP_TIMEOUT',
+    maxRedirects: 'HTTP_MAX_REDIRECTS'
   }
 };
