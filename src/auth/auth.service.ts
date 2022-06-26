@@ -10,33 +10,51 @@ import { ConfigService } from '@nestjs/config';
 import { PasswordResetDto } from '../user/dto/password-reset.dto';
 import { randomBytes, pbkdf2Sync } from "crypto";
 import { MailService } from '../mail/mail.service';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 
 
 @Injectable()
 export class AuthService {
     constructor(private usersRepo: UsersRepository, private jwtTokenService: JwtService,
-         private jwtHelperService: JwtHelperService, private readonly configService: ConfigService,
-         private mailService: MailService
-    ){}
+        private jwtHelperService: JwtHelperService, private readonly configService: ConfigService,
+        private mailService: MailService, private httpService: HttpService
+    ) { }
 
-    async signup(user: CreateUserDto){
-        const userdata = Object.assign(new User(), user)
-        const newUser = await this.usersRepo.save(userdata).catch(e => {
-            throw new BadRequestException(
-                ZuAppResponse.BadRequest("Duplicate Values", "The Email already exists")
-            )
-        })
-        return newUser
+    async signup(user: CreateUserDto)  {
+        
+            const userdata = Object.assign(new User(), user)
+            const newUser = await this.usersRepo.save(userdata).catch(e => {
+                throw new BadRequestException(
+                    ZuAppResponse.BadRequest("Duplicate Values", "The Email already exists")
+                )
+            })
+            // TODO: send POST request to the profile service to create the profile
+            // Axios
+            const new_Profile = this.httpService.post(
+                `${this.configService.get<string>('CORE_SERVICE_BASE_URL')}/profile/create`, {
+                user_id: newUser.id, email: newUser.email
+            });
+
+            const newProfile = await lastValueFrom(new_Profile.pipe())
+            const profileData = newProfile.data
+            newUser.profileID = profileData.id
+
+            const new_User = await this.usersRepo.save(newUser)
+            // TODO: return whole profile to the client
+            // console.log(new_User)
+            return [new_User,profileData] ;
+        
     }
 
-    async signin(user: SignInDto, values: {userAgent: string, ipAddress: string}){
-        let foundUser = await this.usersRepo.findOne({email: user.email});
-        if(foundUser){
-            let hash = this.usersRepo.hashPassword(user.password,foundUser.password.split(':')[0]);
+    async signin(user: SignInDto, values: { userAgent: string, ipAddress: string }) {
+        let foundUser = await this.usersRepo.findOne({ email: user.email });
+        if (foundUser) {
+            let hash = this.usersRepo.hashPassword(user.password, foundUser.password.split(':')[0]);
             let isPasswordCorrect = hash == foundUser.password;
             console.log('Password is correct: ', isPasswordCorrect);
-            if(isPasswordCorrect){
-                return [foundUser, ZuAppResponse.Ok<object>(await this.getNewRefreshAndAccessTokens(values, foundUser),'Successfully logged in')]
+            if (isPasswordCorrect) {
+                return [foundUser, ZuAppResponse.Ok<object>(await this.getNewRefreshAndAccessTokens(values, foundUser), 'Successfully logged in')]
             }
         }
         throw new BadRequestException(
@@ -44,24 +62,24 @@ export class AuthService {
         )
     }
 
-    async getNewRefreshAndAccessTokens(values: {userAgent: string, ipAddress: string}, user){
+    async getNewRefreshAndAccessTokens(values: { userAgent: string, ipAddress: string }, user) {
         const refreshobject = {
             userAgent: values.userAgent,
             ipAddress: values.ipAddress,
             id: user.id
         }
-    
+
         return {
             access: await this.jwtHelperService.signAccess(refreshobject),
             refresh: await this.jwtHelperService.signRefresh(refreshobject)
         }
     }
 
-    async forgotPassword(email: string){
-        const user: User = await this.usersRepo.findOne({where: email})
-        if(!user){
+    async forgotPassword(email: string) {
+        const user: User = await this.usersRepo.findOne({ where: email })
+        if (!user) {
             throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest('Not found','email does not exist on the server', '404')
+                ZuAppResponse.NotFoundRequest('Not found', 'email does not exist on the server', '404')
             )
         }
         const payload = {
@@ -76,21 +94,20 @@ export class AuthService {
 
     }
 
-    async resetPassword(id: string, token: string, body: PasswordResetDto){
-        const user: User = await this.usersRepo.findOne({id})
-        if(!user){
+    async resetPassword(id: string, token: string, body: PasswordResetDto) {
+        const user: User = await this.usersRepo.findOne({ id })
+        if (!user) {
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest('User does not exist on the server')
             )
-        } 
+        }
         await this.jwtHelperService.verifyResetToken(token, user.password)
         let salt = randomBytes(32).toString('hex')
         let hash = pbkdf2Sync(body.password, salt, 1000, 64, 'sha512').toString('hex')
         let hashedPassword = `${salt}:${hash}`
-        await this.usersRepo.update(id, {password: hashedPassword})
+        await this.usersRepo.update(id, { password: hashedPassword })
         return user
-    
+
     }
 
- 
 }
