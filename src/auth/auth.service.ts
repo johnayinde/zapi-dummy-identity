@@ -42,7 +42,6 @@ export class AuthService {
 
             const new_User = await this.usersRepo.save(newUser)
             // TODO: return whole profile to the client
-            // console.log(new_User)
             return [new_User,profileData] ;
         
     }

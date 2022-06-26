@@ -29,7 +29,7 @@ import { UserModule } from './user/user.module';
         database: configService.get(configConstant.database.name),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
