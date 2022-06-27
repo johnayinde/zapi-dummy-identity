@@ -31,7 +31,7 @@ export class AuthService {
 
     async signin(dto: SignInDto, values: {userAgent: string, ipAddress: string}) {
         const user = await this.usersRepo.findOne({email: dto.email});
-        if(!user) throw ZuAppResponse.BadRequest('Not found', 'Access Denied!');
+        if(!user) throw ZuAppResponse.BadRequest('Not found', 'Invalid Credentials!');
         
         const hash = await this.usersRepo.hashPassword(dto.password, user.password.split(':')[0]);
         let isPasswordCorrect = hash == user.password;
