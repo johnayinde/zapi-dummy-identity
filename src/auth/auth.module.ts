@@ -7,6 +7,7 @@ import { UsersRepository } from '../database/repository/user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtHelperService } from './jwtHelper.service';
 import { MailModule } from '../mail/mail.module';
+import {HttpModule} from '@nestjs/axios'
 
 @Module({
   imports: [ 
@@ -17,6 +18,7 @@ import { MailModule } from '../mail/mail.module';
       publicKey: 'PUBLIC_KEY',
       privateKey: 'PRIVATE_KEY',
     }), 
+    HttpModule
   ],
   controllers: [ AuthController],
   providers: [AuthService, JwtHelperService]
