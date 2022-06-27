@@ -12,6 +12,7 @@ import { randomBytes, pbkdf2Sync } from "crypto";
 import { MailService } from '../mail/mail.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { configConstant } from 'src/common/constants/config.constant';
 
 
 @Injectable()
@@ -32,7 +33,7 @@ export class AuthService {
             // TODO: send POST request to the profile service to create the profile
             // Axios
             const new_Profile = this.httpService.post(
-                `${this.configService.get<string>('CORE_SERVICE_BASE_URL')}/profile/create`, {
+                `${this.configService.get<string>(configConstant.profileUrl.baseUrl)}/profile/create`, {
                 user_id: newUser.id, email: newUser.email
             });
 
@@ -41,8 +42,8 @@ export class AuthService {
             newUser.profileID = profileData.id
 
             const new_User = await this.usersRepo.save(newUser)
-            // TODO: return whole profile to the client
-            return [new_User,profileData] ;
+            
+            return new_User ;
         
     }
 

@@ -9,5 +9,8 @@ export const configConstant = {
   httpModule: {
     timeout: 'HTTP_TIMEOUT',
     maxRedirects: 'HTTP_MAX_REDIRECTS'
+  },
+  profileUrl: {
+    baseUrl: 'CORE_SERVICE_BASE_URL'
   }
 };
