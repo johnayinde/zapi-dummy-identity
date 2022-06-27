@@ -19,11 +19,9 @@ export class AuthController {
 
     @Post('/signup')
     @ApiOperation({description: 'Sign up a User'})
-    async signUpUser(
-        @Body() body: CreateUserDto,
-    ){
-        const user = await this.authService.signup(body)
-        return user 
+    async signUpUser(@Body() body: CreateUserDto){
+        const user = await this.authService.signup(body);
+        return user;
     }
 
     @Post('/signin')
@@ -51,4 +49,6 @@ export class AuthController {
         const updatedUser =  await this.authService.resetPassword(id, token, body)
         return updatedUser
     }
+
+    
 }
