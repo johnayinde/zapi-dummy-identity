@@ -47,19 +47,29 @@ export class AuthService {
         
     }
 
-    async signin(user: SignInDto, values: { userAgent: string, ipAddress: string }) {
-        let foundUser = await this.usersRepo.findOne({ email: user.email });
-        if (foundUser) {
-            let hash = this.usersRepo.hashPassword(user.password, foundUser.password.split(':')[0]);
-            let isPasswordCorrect = hash == foundUser.password;
-            console.log('Password is correct: ', isPasswordCorrect);
-            if (isPasswordCorrect) {
-                return [foundUser, ZuAppResponse.Ok<object>(await this.getNewRefreshAndAccessTokens(values, foundUser), 'Successfully logged in')]
-            }
-        }
-        throw new BadRequestException(
-            ZuAppResponse.BadRequest('Invalid Credentials')
-        )
+    async signin(dto: SignInDto, values: {userAgent: string, ipAddress: string}) {
+        const user = await this.usersRepo.findOne({email: dto.email});
+        if(!user) throw ZuAppResponse.BadRequest('Not found', 'Invalid Credentials!');
+        
+        const hash = await this.usersRepo.hashPassword(dto.password, user.password.split(':')[0]);
+        let isPasswordCorrect = hash == user.password;
+        if(!isPasswordCorrect) throw ZuAppResponse.BadRequest('Access Denied!', 'Incorrect Credentials');
+        
+        return ZuAppResponse.Ok<object>(await this.getNewRefreshAndAccessTokens(values, user),'Successfully logged in', 201);
+    }
+
+    async signout(refreshToken: string) {
+        let check = await this.usersRepo.findOne({ where:{refreshToken: refreshToken} });
+        if(!check) throw new BadRequestException(
+            ZuAppResponse.BadRequest('Invalid Refresh Token','Get the correct refresh token and try again')
+        );
+        
+        await this.usersRepo.update({refreshToken: refreshToken}, {refreshToken: null});
+        return ZuAppResponse.Ok('','Successfully logged out', 201)
+    }
+
+    async getNewTokens(refreshToken: string){
+        return await this.jwtHelperService.getNewTokens(refreshToken)
     }
 
     async getNewRefreshAndAccessTokens(values: { userAgent: string, ipAddress: string }, user) {
