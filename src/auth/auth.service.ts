@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { UsersRepository } from '../database/repository/user.repository';
 import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -13,11 +12,15 @@ import { MailService } from '../mail/mail.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { configConstant } from 'src/common/constants/config.constant';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private usersRepo: UsersRepository, private jwtTokenService: JwtService,
+    constructor(
+        @InjectRepository(User)
+        private usersRepo: Repository<User>, private jwtTokenService: JwtService,
         private jwtHelperService: JwtHelperService, private readonly configService: ConfigService,
         private mailService: MailService, private httpService: HttpService
     ) { }
@@ -48,10 +51,10 @@ export class AuthService {
     }
 
     async signin(dto: SignInDto, values: {userAgent: string, ipAddress: string}) {
-        const user = await this.usersRepo.findOne({email: dto.email});
+        const user = await this.usersRepo.findOne({where : {email: dto.email}});
         if(!user) throw ZuAppResponse.BadRequest('Not found', 'Invalid Credentials!');
         
-        const hash = await this.usersRepo.hashPassword(dto.password, user.password.split(':')[0]);
+        const hash = await this.jwtHelperService.hashPassword(dto.password, user.password.split(':')[0]);
         let isPasswordCorrect = hash == user.password;
         if(!isPasswordCorrect) throw ZuAppResponse.BadRequest('Access Denied!', 'Incorrect Credentials');
         
@@ -86,7 +89,7 @@ export class AuthService {
     }
 
     async forgotPassword(email: string) {
-        const user: User = await this.usersRepo.findOne({ where: email })
+        const user: User = await this.usersRepo.findOne({ where:{ email }})
         if (!user) {
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest('Not found', 'email does not exist on the server', '404')
@@ -105,7 +108,7 @@ export class AuthService {
     }
 
     async resetPassword(id: string, token: string, body: PasswordResetDto) {
-        const user: User = await this.usersRepo.findOne({ id })
+        const user: User = await this.usersRepo.findOne({where: { id }})
         if (!user) {
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest('User does not exist on the server')

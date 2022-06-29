@@ -3,12 +3,16 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "../common/constants/jwt.constant";
 import { ZuAppResponse } from "../common/helpers/response";
-import { UsersRepository } from "../database/repository/user.repository";
+import { randomBytes, pbkdf2Sync } from "crypto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "src/entities/user.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class JwtHelperService {
     constructor (
-        private userRepo: UsersRepository,
+        @InjectRepository(User)
+        private userRepo: Repository<User>,
         private jwTokenService: JwtService,
         private configService: ConfigService
     ){}
@@ -26,7 +30,7 @@ export class JwtHelperService {
             expiresIn: await this.configService.get(jwtConstants.refresh_time)
         })
 
-        let user = await this.userRepo.findOne(payload.id)
+        let user = await this.userRepo.findOne({where: {id : payload.id}})
         await this.userRepo.update(user.id, {refreshToken}).catch(err => {
             throw new BadRequestException(
                 ZuAppResponse.BadRequest('user not found', 'This user does not exist')
@@ -81,5 +85,12 @@ export class JwtHelperService {
             )
         } 
       
+    }
+
+    async hashPassword(password: string, salt ?: string){
+        if(!salt) salt = randomBytes(32).toString('hex')
+        let hash = pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
+        let hashedPassword = `${salt}:${hash}`
+        return hashedPassword
     }
 }

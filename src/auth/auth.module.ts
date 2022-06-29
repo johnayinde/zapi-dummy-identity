@@ -3,15 +3,15 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
-import { UsersRepository } from '../database/repository/user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtHelperService } from './jwtHelper.service';
 import { MailModule } from '../mail/mail.module';
 import {HttpModule} from '@nestjs/axios'
+import { User } from 'src/entities/user.entity';
 
 @Module({
   imports: [ 
-    TypeOrmModule.forFeature([UsersRepository]), 
+    TypeOrmModule.forFeature([User]), 
     UserModule,
     MailModule,
     JwtModule.register({
