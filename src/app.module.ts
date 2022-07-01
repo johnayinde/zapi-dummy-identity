@@ -17,7 +17,7 @@ import { AppDataSource } from 'ormconfig';
     ConfigModule.forRoot({ 
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync(AppDataSource.options),
+    TypeOrmModule.forRoot(AppDataSource.options),
   ],
   controllers: [AppController],
   providers: [AppService],
