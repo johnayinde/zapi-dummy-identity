@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtHelperService } from './jwtHelper.service';
 import { MailModule } from '../mail/mail.module';
 import {HttpModule} from '@nestjs/axios'
-import { User } from 'src/entities/user.entity';
+import { User } from '../entities/user.entity';
 
 @Module({
   imports: [ 
