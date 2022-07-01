@@ -16,8 +16,8 @@ async function bootstrap() {
       .addBearerAuth()
       .build()
     
-    /*const document = SwaggerModule.createDocument(app, options)
-    SwaggerModule.setup('api-hub', app, document) */
+    const document = SwaggerModule.createDocument(app, options)
+    SwaggerModule.setup('api-hub', app, document)
   }
   
   await app.listen(Number(process.env.NODE_PORT) ||3000);
