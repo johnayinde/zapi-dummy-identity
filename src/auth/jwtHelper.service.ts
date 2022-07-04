@@ -5,7 +5,7 @@ import { jwtConstants } from "../common/constants/jwt.constant";
 import { ZuAppResponse } from "../common/helpers/response";
 import { randomBytes, pbkdf2Sync } from "crypto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "src/entities/user.entity";
+import { User } from "../entities/user.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

@@ -8,11 +8,11 @@ import { Repository } from 'typeorm';
 export class UserService {
     constructor(
         @InjectRepository(User)
-         private readonly usersrepo: Repository<User>
+         private readonly usersRepo: Repository<User>
     ){}
     
     findOne(id: string){
-        const user = this.usersrepo.findOne({where :{id}})
+        const user = this.usersRepo.findOne({where :{id}})
         if(!user){
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest("Not found",'User not found')
@@ -22,7 +22,7 @@ export class UserService {
     }
 
     async findByEmail(email: string){
-        const user = await  this.usersrepo.findOne({where:{email: email}})
+        const user = await  this.usersRepo.findOne({where:{email: email}})
         if(!user) { 
             throw new NotFoundException(
                  ZuAppResponse.NotFoundRequest("Not found",' not found', "404")
@@ -32,14 +32,14 @@ export class UserService {
     }
 
     async update(id: string, attrs: Partial<User>){
-        const user = await this.usersrepo.findOne({where :{id}})
+        const user = await this.usersRepo.findOne({where :{id}})
         if (!user){
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest('user not found')
             )
         }
         Object.assign(user, attrs)
-        const updatedUser = this.usersrepo.save(user)
+        const updatedUser = this.usersRepo.save(user)
         return updatedUser
     }
 

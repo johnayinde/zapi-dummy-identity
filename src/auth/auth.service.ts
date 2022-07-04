@@ -11,7 +11,7 @@ import { randomBytes, pbkdf2Sync } from "crypto";
 import { MailService } from '../mail/mail.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
-import { configConstant } from 'src/common/constants/config.constant';
+import { configConstant } from '../common/constants/config.constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
