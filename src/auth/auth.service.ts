@@ -57,8 +57,8 @@ export class AuthService {
         const hash = await this.jwtHelperService.hashPassword(dto.password, user.password.split(':')[0]);
         let isPasswordCorrect = hash == user.password;
         if(!isPasswordCorrect) throw ZuAppResponse.BadRequest('Access Denied!', 'Incorrect Credentials');
-        
-        return ZuAppResponse.Ok<object>(await this.getNewRefreshAndAccessTokens(values, user),'Successfully logged in', 201);
+        const tokens = await this.getNewRefreshAndAccessTokens(values, user)
+        return ZuAppResponse.Ok<object>({...tokens, userId: user.id, profileId: user.profileID},'Successfully logged in', 201);
     }
 
     async signout(refreshToken: string) {
