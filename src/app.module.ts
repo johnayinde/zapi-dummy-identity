@@ -7,6 +7,7 @@ import { configConstant } from './common/constants/config.constant';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AppDataSource } from 'ormconfig';
+import { EmailVerificationModule } from './email-verification/email-verification.module';
 
 
 
@@ -18,6 +19,7 @@ import { AppDataSource } from 'ormconfig';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(AppDataSource.options),
+    EmailVerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

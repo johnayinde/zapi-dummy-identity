@@ -8,9 +8,13 @@ export const configConstant = {
   },
   httpModule: {
     timeout: 'HTTP_TIMEOUT',
-    maxRedirects: 'HTTP_MAX_REDIRECTS'
+    maxRedirects: 'HTTP_MAX_REDIRECTS',
   },
   profileUrl: {
-    baseUrl: 'CORE_SERVICE_BASE_URL'
-  }
+    baseUrl: 'CORE_SERVICE_BASE_URL',
+  },
+  baseUrl: {
+    noficationUrl: 'NOTIFICATION_URL',
+    identityUrl: 'IDENTITY_SERVICE_BASE_URL',
+  },
 };
