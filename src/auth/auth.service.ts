@@ -28,13 +28,14 @@ export class AuthService {
     private jwtTokenService: JwtService,
     private jwtHelperService: JwtHelperService,
     private readonly configService: ConfigService,
+    private mailService: MailService,
+    private httpService: HttpService,
     private emailVerificationService: EmailVerificationService,
   ) {}
 
   async signup(user: CreateUserDto) {
     const userdata = Object.assign(new User(), user);
-    const newUser = await this.usersRepo.save(userdata).catch(async (e) => {
-      await this.emailVerificationService.resendVerificationLink(user.email);
+    const newUser = await this.usersRepo.save(userdata).catch((e) => {
       throw new BadRequestException(
         ZuAppResponse.BadRequest(
           'Duplicate Values',
@@ -42,9 +43,9 @@ export class AuthService {
         ),
       );
     });
-    console.log('Before initiation');
+
+    //send a verification link to the user
     await this.emailVerificationService.sendVerificationLink(newUser.email);
-    console.log('after initiation');
 
     return newUser;
   }
@@ -66,7 +67,13 @@ export class AuthService {
       throw ZuAppResponse.BadRequest('Access Denied!', 'Incorrect Credentials');
     const tokens = await this.getNewRefreshAndAccessTokens(values, user);
     return ZuAppResponse.Ok<object>(
-      { ...tokens, userId: user.id, profileId: user.profileID },
+      {
+        ...tokens,
+        userId: user.id,
+        profileId: user.profileID,
+        email: user.email,
+        fullName: user.fullName,
+      },
       'Successfully logged in',
       201,
     );
