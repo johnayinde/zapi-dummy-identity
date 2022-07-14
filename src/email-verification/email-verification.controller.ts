@@ -14,6 +14,6 @@ export class EmailVerificationController {
     const user = await this.emailVerificatioService.decodeEmailToken(
       emailTokenDto.token,
     );
-    return ZuAppResponse.Ok<object>(user, 'Profile created', 201);
+    return ZuAppResponse.Ok<object>({ user }, 'Profile created', 201);
   }
 }
