@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { ZuAppResponse } from '../common/helpers/response';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -10,32 +11,52 @@ export class UserService {
         @InjectRepository(User)
          private readonly usersRepo: Repository<User>
     ){}
-    
-    findOne(id: string){
-        const user = this.usersRepo.findOne({where :{id}})
-        if(!user){
+
+    async checkUserExists(userId){
+        const userExists = await this.usersRepo.findOneBy({id: userId})
+        if(!userExists){
             throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest("Not found",'User not found')
-           )
+                ZuAppResponse.NotFoundRequest(
+                   "Not found",
+                   `User with id : ${userId} does not exist`, 
+                   "404")
+            )
         }
+        return userExists
+    }
+
+    async findById(id: string){
+        //check if user exists
+        const user = await this.checkUserExists(id)
+        //return user
         return user
     }
 
-    async findByEmail(email: string){
-        const user = await  this.usersRepo.findOne({where:{email: email}})
-        if(!user) { 
-            throw new NotFoundException(
-                 ZuAppResponse.NotFoundRequest("Not found",' not found', "404")
+    async editUserById(dto: UpdateUserDto, id: string){
+        //check if user exists
+        await this.checkUserExists(id)
+
+        //update user details
+        return await this.usersRepo.update(id, dto).catch((err)=>{
+            throw new BadRequestException(
+                ZuAppResponse.BadRequest(
+                    "Internal server error", 
+                    "User not updated",
+                    "500")
             )
-        }
-        return user
+        })   
     }
+
+    
 
     async update(id: string, attrs: Partial<User>){
         const user = await this.usersRepo.findOne({where :{id}})
         if (!user){
             throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest('user not found')
+                ZuAppResponse.NotFoundRequest(
+                    "Internal server error",
+                    'user not found',
+                    "404")
             )
         }
         Object.assign(user, attrs)
