@@ -1,6 +1,7 @@
 import { Controller, Param, Get } from '@nestjs/common';
 import { EmailVerificationService } from './email-verification.service';
 import { EmailTokenDto } from './dto/email-token.dto';
+import { ZuAppResponse } from 'src/common/helpers/response';
 
 @Controller('email-verification')
 export class EmailVerificationController {
@@ -10,8 +11,9 @@ export class EmailVerificationController {
 
   @Get('/:token')
   async verifyEmail(@Param() emailTokenDto: EmailTokenDto) {
-    return await this.emailVerificatioService.decodeEmailToken(
+    const user = await this.emailVerificatioService.decodeEmailToken(
       emailTokenDto.token,
     );
+    return ZuAppResponse.Ok<object>(user, 'Profile created', 201);
   }
 }
