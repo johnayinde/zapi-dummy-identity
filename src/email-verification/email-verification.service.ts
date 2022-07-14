@@ -41,7 +41,9 @@ export class EmailVerificationService {
 
     // A called to axios to send maill notification
     const sendNotification = await this.httpService.post(
-      `${this.configService.get<string>(configConstant.baseUrl.noficationUrl)}`,
+      `${this.configService.get<string>(
+        configConstant.baseUrl.nofication,
+      )}/email/send-mail`,
       {
         email: email,
         subject: 'Confirm Email',

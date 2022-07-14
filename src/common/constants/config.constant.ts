@@ -14,7 +14,7 @@ export const configConstant = {
     baseUrl: 'CORE_SERVICE_BASE_URL',
   },
   baseUrl: {
-    noficationUrl: 'NOTIFICATION_URL',
+    nofication: 'NOTIFICATION_URL',
     identityUrl: 'IDENTITY_SERVICE_BASE_URL',
   },
 };
