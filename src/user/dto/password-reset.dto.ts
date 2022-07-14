@@ -1,9 +1,11 @@
 import { IsString, MinLength, Matches, MaxLength, IsNotEmpty} from 'class-validator'
 import { Match } from '../../common/decorators/password-match.decorator'
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PasswordResetDto {
     @IsString()
     @IsNotEmpty({message: 'password cannot be empty'})
+    @ApiProperty()
     @MinLength(8, 
         {message: 'Password is too short. Minimal length is $constraint1 characters, but actual is $value'}
     )
@@ -17,6 +19,7 @@ export class PasswordResetDto {
 
     @IsString()
     @IsNotEmpty({message: 'kindly confirm password'})
+    @ApiProperty()
     @MinLength(8)
     @MaxLength(20)
     @Match('password')
