@@ -7,6 +7,7 @@ import { SignInDto } from './dto/signin.dto';
 import { UserDto } from '../user/dto/user.dto';
 import { Request } from 'express';
 import { PasswordResetDto } from '../user/dto/password-reset.dto';
+import { PasswordForgotEmailDto } from 'src/user/dto/password-email.dto';
 
 
 @ApiTags("Auth-Users")
@@ -45,8 +46,8 @@ export class AuthController {
     @Serialize(UserDto)
     @Post('/forgot/post')
     @ApiOperation({description:'submit email for password reset'})
-    async forgotPassword(@Body() email: string){
-        return await this.authService.forgotPassword(email)
+    async forgotPassword(@Body() body: PasswordForgotEmailDto){
+        return await this.authService.forgotPassword(body.email)
     }
 
     @Serialize(UserDto)
