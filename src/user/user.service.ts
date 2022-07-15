@@ -11,41 +11,33 @@ export class UserService {
         @InjectRepository(User)
          private readonly usersRepo: Repository<User>
     ){}
-    
-    findOne(id: string){
-        const user = this.usersRepo.findOne({where :{id}})
-        if(!user){
-            throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest("Not found",'User not found')
-           )
-        }
-        return user
-    }
 
-    async findByEmail(email: string){
-        const user = await  this.usersRepo.findOne({where:{email: email}})
-        if(!user) { 
-            throw new NotFoundException(
-                 ZuAppResponse.NotFoundRequest("Not found",' not found', "404")
-            )
-        }
-        return user
-    }
-
-    async editUserById(dto: UpdateUserDto, userId: string){
-        //check if user exists
-        const userExists = await this.usersRepo.findOne({where:{id:userId}})
+    async checkUserExists(userId){
+        const userExists = await this.usersRepo.findOneBy({id: userId})
         if(!userExists){
             throw new NotFoundException(
                 ZuAppResponse.NotFoundRequest(
-                    "Not found", 
-                    `User with id : ${userId} does not exist`, 
-                    "404")
+                   "Not found",
+                   `User with id : ${userId} does not exist`, 
+                   "404")
             )
         }
-        
+        return userExists
+    }
+
+    async findById(id: string){
+        //check if user exists
+        const user = await this.checkUserExists(id)
+        //return user
+        return user
+    }
+
+    async editUserById(dto: UpdateUserDto, id: string){
+        //check if user exists
+        await this.checkUserExists(id)
+
         //update user details
-        return await this.usersRepo.update(userId, dto).catch((err)=>{
+        return await this.usersRepo.update(id, dto).catch((err)=>{
             throw new BadRequestException(
                 ZuAppResponse.BadRequest(
                     "Internal server error", 
@@ -56,44 +48,12 @@ export class UserService {
         
     }
 
-    async editUserByEmail(dto: UpdateUserDto, email: string){
+    async deleteUser(id: string){
         //check if user exists
-        const userExists = await this.usersRepo.findOne({where:{email:email}})
-        if(!userExists){
-            throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest(
-                    "Not found", 
-                    `User with email : ${email} does not exist`, 
-                    "404")
-            )
-        }
-        
-        //update user details
-        return await this.usersRepo.update(email, dto).catch((err)=>{
-            throw new BadRequestException(
-                ZuAppResponse.BadRequest(
-                    "Internal server error", 
-                    "User not updated",
-                    "500")
-            )
-        })
-        
-    }
-
-    async deleteUser(userId: string){
-        //check if user exists
-        const userExists = await this.usersRepo.findOne({where:{id:userId}})
-        if(!userExists){
-            throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest(
-                    "Not found", 
-                    "User not found", 
-                    "404")
-            )
-        }
+        await this.checkUserExists(id)
 
         //delete user details
-        return await this.usersRepo.delete(userId).catch((err)=>{
+        return await this.usersRepo.delete(id).catch((err)=>{
             throw new BadRequestException(
                 ZuAppResponse.BadRequest(
                     "Internal server error", 
@@ -107,7 +67,10 @@ export class UserService {
         const user = await this.usersRepo.findOne({where :{id}})
         if (!user){
             throw new NotFoundException(
-                ZuAppResponse.NotFoundRequest('user not found')
+                ZuAppResponse.NotFoundRequest(
+                    "Internal server error",
+                    'user not found',
+                    "404")
             )
         }
         Object.assign(user, attrs)
