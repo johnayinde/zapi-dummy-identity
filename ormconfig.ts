@@ -1,7 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
-
 ConfigModule.forRoot();
 
 export const AppDataSource = new DataSource({
@@ -12,7 +11,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  logging: true,
+  // logging: true,
   migrations: ['dist/src/database/migration/*.js'],
   synchronize: false,
 });
