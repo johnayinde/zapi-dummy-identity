@@ -18,6 +18,7 @@ import { lastValueFrom } from 'rxjs';
 import { configConstant } from '../common/constants/config.constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EmailVerificationService } from '../email-verification/email-verification.service';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private mailService: MailService,
     private httpService: HttpService,
+    private emailVerificationService: EmailVerificationService,
   ) {}
 
   async signup(user: CreateUserDto) {
@@ -41,25 +43,11 @@ export class AuthService {
         ),
       );
     });
-    // TODO: send POST request to the profile service to create the profile
-    // Axios
-    const new_Profile = this.httpService.post(
-      `${this.configService.get<string>(
-        configConstant.profileUrl.baseUrl,
-      )}/profile/create`,
-      {
-        user_id: newUser.id,
-        email: newUser.email,
-      },
-    );
 
-    const newProfile = await lastValueFrom(new_Profile.pipe());
-    const profileData = newProfile.data;
-    newUser.profileID = profileData.id;
+    //send a verification link to the user
+    await this.emailVerificationService.sendVerificationLink(newUser.email);
 
-    const new_User = await this.usersRepo.save(newUser);
-
-    return new_User;
+    return newUser;
   }
 
   async signin(
