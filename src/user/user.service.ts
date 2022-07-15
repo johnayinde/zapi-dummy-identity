@@ -44,24 +44,10 @@ export class UserService {
                     "User not updated",
                     "500")
             )
-        })
-        
+        })   
     }
 
-    async deleteUser(id: string){
-        //check if user exists
-        await this.checkUserExists(id)
-
-        //delete user details
-        return await this.usersRepo.delete(id).catch((err)=>{
-            throw new BadRequestException(
-                ZuAppResponse.BadRequest(
-                    "Internal server error", 
-                    "User not deleted",
-                    "500")
-            )
-        })
-    }
+    
 
     async update(id: string, attrs: Partial<User>){
         const user = await this.usersRepo.findOne({where :{id}})
