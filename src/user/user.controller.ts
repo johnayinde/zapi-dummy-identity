@@ -19,12 +19,6 @@ export class UserController {
         return await this.userService.findById(userId)
     }
 
-    // @Get('/:email')
-    // @ApiOperation({description: "Find a user by email"})
-    // async findUserByEmail(@Param('email') email: string){
-    //     return await this.userService.findByEmail(email)
-    // }
-
     @Patch('/:userId')
     @ApiOperation({description:"Update a user"})
     async updateUserById(
@@ -33,17 +27,4 @@ export class UserController {
             return await this.userService.editUserById(updateUserDto, userId)
     }
 
-    // @Patch('/:email')
-    // @ApiOperation({description:"Update a user"})
-    // async updateUserByEmail(
-    //     @Param('email') email: string,
-    //     @Body() updateUserDto: UpdateUserDto){
-    //         return await this.userService.editUserById(updateUserDto, email)
-    // }
-
-    @Delete('/:userId')
-    @ApiOperation({description:"delete a user"})
-    async deleteUser(@Param('userId') userId: string){
-        return await this.userService.deleteUser(userId)
-    }
 }
