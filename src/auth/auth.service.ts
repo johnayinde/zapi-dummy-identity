@@ -150,10 +150,25 @@ export class AuthService {
       payload,
       currentPassword,
     );
-    const resetLink = `http://localhost:3000/api-hub/auth/reset/${user.id}/${resetToken}`;
-    // await this.mailService.sendResetLink(user, resetLink) -> this is to send the reset link to the user's email instead
-    return resetLink;
+    const resetUrl = this.configService.get(configConstant.passwordReset.resetUrl)
+    const emailUrl = this.configService.get(configConstant.passwordReset.emailUrl)
+    const resetLink = `${resetUrl}/${user.id}/${resetToken}`;
+    const emailLink = {
+      email: user.email,
+      subject: "Password Reset Request",
+      text: `Kindly click the link below to proceed with the password reset 
+            \n ${resetLink}`
+    }
+    const p = this.httpService.axiosRef;
+    // This sends the reset link to the registered email of the user
+    const axiosRes = await p({
+      method: 'post',
+      url: emailUrl,
+      data: emailLink
+    })
+    return [resetLink, `reset link sent to ${user.email} successfully` ];
   }
+
 
   async resetPassword(id: string, token: string, body: PasswordResetDto) {
     const user: User = await this.usersRepo.findOne({ where: { id } });
