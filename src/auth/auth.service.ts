@@ -57,26 +57,38 @@ export class AuthService {
     const user = await this.usersRepo.findOne({ where: { email: dto.email } });
     if (!user)
       throw ZuAppResponse.BadRequest('Not found', 'Invalid Credentials!');
-
-    const hash = await this.jwtHelperService.hashPassword(
-      dto.password,
-      user.password.split(':')[0],
-    );
-    let isPasswordCorrect = hash == user.password;
-    if (!isPasswordCorrect)
-      throw ZuAppResponse.BadRequest('Access Denied!', 'Incorrect Credentials');
-    const tokens = await this.getNewRefreshAndAccessTokens(values, user);
-    return ZuAppResponse.Ok<object>(
-      {
-        ...tokens,
-        userId: user.id,
-        profileId: user.profileID,
-        email: user.email,
-        fullName: user.fullName,
-      },
-      'Successfully logged in',
-      201,
-    );
+    if (user.isEmailVerified) {
+      const hash = await this.jwtHelperService.hashPassword(
+        dto.password,
+        user.password.split(':')[0],
+      );
+      let isPasswordCorrect = hash == user.password;
+      if (!isPasswordCorrect)
+        throw ZuAppResponse.BadRequest(
+          'Access Denied!',
+          'Incorrect Credentials',
+        );
+      const tokens = await this.getNewRefreshAndAccessTokens(values, user);
+      return ZuAppResponse.Ok<object>(
+        {
+          ...tokens,
+          userId: user.id,
+          profileId: user.profileID,
+          email: user.email,
+          fullName: user.fullName,
+        },
+        'Successfully logged in',
+        201,
+      );
+    } else {
+      throw new BadRequestException(
+        ZuAppResponse.BadRequest(
+          'Access Denied',
+          'Please verify your email before logging in',
+          '401',
+        ),
+      );
+    }
   }
 
   async signout(refreshToken: string) {
