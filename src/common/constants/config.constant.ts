@@ -17,4 +17,9 @@ export const configConstant = {
     nofication: 'NOTIFICATION_URL',
     identityUrl: 'IDENTITY_SERVICE_BASE_URL',
   },
+  passwordReset: {
+    resetUrl: 'PASSWORD_RESET_URL',
+    emailUrl: 'EMAIL_NOTIFICATION_URL'
+  }
+  
 };
