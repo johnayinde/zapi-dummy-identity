@@ -18,7 +18,7 @@ export const configConstant = {
     identityUrl: 'IDENTITY_SERVICE_BASE_URL',
   },
   passwordReset: {
-    resetUrl: 'PSWRDRSTURL',
+    resetUrl: 'PASSWORD_RESET_URL',
     emailUrl: 'EMAIL_NOTIFICATION_URL'
   }
   

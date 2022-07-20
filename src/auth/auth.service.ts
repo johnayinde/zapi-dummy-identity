@@ -166,7 +166,7 @@ export class AuthService {
       url: emailUrl,
       data: emailLink
     })
-    return [resetLink, `reset link sent to ${user.email} successfully` ];
+    return [resetLink, `\n reset link sent to ${user.email} successfully` ];
   }
 
 
