@@ -150,23 +150,30 @@ export class AuthService {
       payload,
       currentPassword,
     );
-    const resetUrl = this.configService.get(configConstant.passwordReset.resetUrl)
-    const emailUrl = this.configService.get(configConstant.passwordReset.emailUrl)
-    const resetLink = `${resetUrl}/${user.id}/${resetToken}`;
+
+    //url paths
+    const baseUrl = this.configService.get(configConstant.baseUrl.identityUrl)
+    const notifyUrl = this.configService.get(configConstant.baseUrl.nofication)
+    const resetEndpoint = `${baseUrl}/Auth-Users/AuthController_resetPassword/${resetToken}`;
+    const frontEndBase = this.configService.get(configConstant.baseUrl.identityUrlFE)
+    const resetPage = `${frontEndBase}/password-reset`
+    const emailUrlPath = `${notifyUrl}/email/send-mail`
+
+
     const emailLink = {
       email: user.email,
       subject: "Password Reset Request",
       text: `Kindly click the link below to proceed with the password reset 
-            \n ${resetLink}`
+            \n ${resetPage}`
     }
     const p = this.httpService.axiosRef;
     // This sends the reset link to the registered email of the user
     const axiosRes = await p({
       method: 'post',
-      url: emailUrl,
+      url: emailUrlPath,
       data: emailLink
     })
-    return [resetLink, `\n reset link sent to ${user.email} successfully` ];
+    return [resetEndpoint, `\n reset link sent to ${user.email} successfully` ];
   }
 
 

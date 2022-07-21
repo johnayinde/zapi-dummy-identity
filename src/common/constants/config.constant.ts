@@ -14,12 +14,8 @@ export const configConstant = {
     baseUrl: 'CORE_SERVICE_BASE_URL',
   },
   baseUrl: {
-    nofication: 'NOTIFICATION_URL',
+    nofication: 'NOTIFICATION_SERVICE_URL',
     identityUrl: 'IDENTITY_SERVICE_BASE_URL',
+    identityUrlFE: 'IDENTITY_FE_BASE_URL',
   },
-  passwordReset: {
-    resetUrl: 'PASSWORD_RESET_URL',
-    emailUrl: 'EMAIL_NOTIFICATION_URL'
-  }
-  
 };

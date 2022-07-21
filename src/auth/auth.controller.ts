@@ -51,7 +51,7 @@ export class AuthController {
     }
 
     @Serialize(UserDto)
-    @Post('/reset/:id/:token')
+    @Post('/reset/:token')
     @ApiOperation({description: 'password reset function'})
     async resetPassword(
         @Param('id', new ParseUUIDPipe()) id: string,
