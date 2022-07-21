@@ -8,6 +8,7 @@ import { ZuAppResponse } from '../common/helpers/response';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { SignInDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Ok } from '../common/helpers/response';
 import { JwtHelperService } from './jwtHelper.service';
 import { ConfigService } from '@nestjs/config';
 import { PasswordResetDto } from '../user/dto/password-reset.dto';
@@ -130,7 +131,7 @@ export class AuthService {
     };
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword(email: string): Promise<string> {
     const user: User = await this.usersRepo.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException(
@@ -173,11 +174,13 @@ export class AuthService {
       url: emailUrlPath,
       data: emailLink
     })
-    return [resetEndpoint, `\n reset link sent to ${user.email} successfully` ];
+    return resetEndpoint
   }
 
 
-  async resetPassword(id: string, token: string, body: PasswordResetDto) {
+  async resetPassword(id: string, token: string, body: PasswordResetDto) 
+  : Promise<User>
+  {
     const user: User = await this.usersRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(
@@ -191,6 +194,6 @@ export class AuthService {
     );
     let hashedPassword = `${salt}:${hash}`;
     await this.usersRepo.update(id, { password: hashedPassword });
-    return user;
+    return user
   }
 }
