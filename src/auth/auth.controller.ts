@@ -8,6 +8,8 @@ import { UserDto } from '../user/dto/user.dto';
 import { Request } from 'express';
 import { PasswordResetDto } from '../user/dto/password-reset.dto';
 import { PasswordForgotEmailDto } from 'src/user/dto/password-email.dto';
+import { Ok, ZuAppResponse } from '../common/helpers/response';
+import { User } from '../entities/user.entity';
 
 
 @ApiTags("Auth-Users")
@@ -46,21 +48,21 @@ export class AuthController {
     @Serialize(UserDto)
     @Post('/forgot/post')
     @ApiOperation({description:'submit email for password reset'})
-    async forgotPassword(@Body() body: PasswordForgotEmailDto){
-        return await this.authService.forgotPassword(body.email)
+    async forgotPassword(@Body() body: PasswordForgotEmailDto
+    ): Promise<Ok<string>>    {
+        const resetPageUrl = await this.authService.forgotPassword(body.email)
+        return ZuAppResponse.Ok(resetPageUrl, "A Reset link has been sent to the user's email", 200)
     }
 
     @Serialize(UserDto)
-    @Post('/reset/:id/:token')
+    @Post('/reset/:token')
     @ApiOperation({description: 'password reset function'})
     async resetPassword(
         @Param('id', new ParseUUIDPipe()) id: string,
         @Param('token') token: string,
         @Body() body: PasswordResetDto
-    ){
+    ): Promise<Ok<User>>{
         const updatedUser =  await this.authService.resetPassword(id, token, body)
-        return updatedUser
-    }
-
-    
+        return ZuAppResponse.Ok( updatedUser, 'User password reset successful', '200')
+    }    
 }

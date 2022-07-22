@@ -8,6 +8,7 @@ import { ZuAppResponse } from '../common/helpers/response';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { SignInDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Ok } from '../common/helpers/response';
 import { JwtHelperService } from './jwtHelper.service';
 import { ConfigService } from '@nestjs/config';
 import { PasswordResetDto } from '../user/dto/password-reset.dto';
@@ -130,7 +131,7 @@ export class AuthService {
     };
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword(email: string): Promise<string> {
     const user: User = await this.usersRepo.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException(
@@ -150,27 +151,36 @@ export class AuthService {
       payload,
       currentPassword,
     );
-    const resetUrl = this.configService.get(configConstant.passwordReset.resetUrl)
-    const emailUrl = this.configService.get(configConstant.passwordReset.emailUrl)
-    const resetLink = `${resetUrl}/${user.id}/${resetToken}`;
+
+    //url paths
+    const baseUrl = this.configService.get(configConstant.baseUrl.identityUrl)
+    const notifyUrl = this.configService.get(configConstant.baseUrl.nofication)
+    const resetEndpoint = `${baseUrl}/Auth-Users/AuthController_resetPassword/${resetToken}`;
+    const frontEndBase = this.configService.get(configConstant.baseUrl.identityUrlFE)
+    const resetPage = `${frontEndBase}/password-reset`
+    const emailUrlPath = `${notifyUrl}/email/send-mail`
+
+
     const emailLink = {
       email: user.email,
       subject: "Password Reset Request",
       text: `Kindly click the link below to proceed with the password reset 
-            \n ${resetLink}`
+            \n ${resetPage}`
     }
     const p = this.httpService.axiosRef;
     // This sends the reset link to the registered email of the user
     const axiosRes = await p({
       method: 'post',
-      url: emailUrl,
+      url: emailUrlPath,
       data: emailLink
     })
-    return [resetLink, `\n reset link sent to ${user.email} successfully` ];
+    return resetEndpoint
   }
 
 
-  async resetPassword(id: string, token: string, body: PasswordResetDto) {
+  async resetPassword(id: string, token: string, body: PasswordResetDto) 
+  : Promise<User>
+  {
     const user: User = await this.usersRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(
@@ -184,6 +194,6 @@ export class AuthService {
     );
     let hashedPassword = `${salt}:${hash}`;
     await this.usersRepo.update(id, { password: hashedPassword });
-    return user;
+    return user
   }
 }
