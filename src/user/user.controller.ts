@@ -9,12 +9,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('user')
-@Serialize(UserDto)
 export class UserController {
     constructor(private readonly userService : UserService){}
 
+    @Serialize(UserDto)
     @Get('/:userId')
-    @ApiOperation({description:"Find a user bi Id"})
+    @ApiOperation({description:"Find a user by Id"})
     async findUserById(@Param('userId') userId: string){
         return await this.userService.findById(userId)
     }
@@ -24,7 +24,8 @@ export class UserController {
     async updateUserById(
         @Param('userId') userId: string,
         @Body() updateUserDto: UpdateUserDto){
-            return await this.userService.editUserById(updateUserDto, userId)
+            await this.userService.editUserById(updateUserDto, userId)
+            return ZuAppResponse.Ok(updateUserDto.fullName, "User update successful",'200')
     }
 
 }
