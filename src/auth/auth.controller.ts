@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
@@ -10,6 +10,7 @@ import { PasswordResetDto } from '../user/dto/password-reset.dto';
 import { PasswordForgotEmailDto } from 'src/user/dto/password-email.dto';
 import { Ok, ZuAppResponse } from '../common/helpers/response';
 import { User } from '../entities/user.entity';
+import { ChangePasswordDto } from 'src/user/dto/change-password.dto';
 
 
 @ApiTags("Auth-Users")
@@ -64,5 +65,16 @@ export class AuthController {
     ): Promise<Ok<User>>{
         const updatedUser =  await this.authService.resetPassword(id, token, body)
         return ZuAppResponse.Ok( updatedUser, 'User password reset successful', '200')
-    }    
+    }  
+    
+    //@Serialize(UserDto)
+    @Patch('/changepassword/:id')
+    @ApiOperation({description: 'update password'})
+    async changePassword(
+        @Param('id') id: string,
+        @Body() body: ChangePasswordDto
+    ){
+        await this.authService.changePassword(id, body)
+        return ZuAppResponse.Ok("Password updated", "200")
+    }
 }
