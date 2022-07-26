@@ -16,8 +16,9 @@ export class UserController {
     @Get('/:userId')
     @ApiOperation({description:"Find a user by Id"})
     async findUserById(@Param('userId') userId: string){
-        const user = await this.userService.findById(userId)
-        return ZuAppResponse.Ok(user,"200")
+        return await this.userService.findById(userId)
+        // console.log(user)
+        // return ZuAppResponse.Ok(user,"200")
     }
 
     @Patch('/:userId')
