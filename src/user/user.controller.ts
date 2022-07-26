@@ -9,10 +9,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('user')
-@Serialize(UserDto)
 export class UserController {
     constructor(private readonly userService : UserService){}
 
+    @Serialize(UserDto)
     @Get('/:userId')
     @ApiOperation({description:"Find a user by Id"})
     async findUserById(@Param('userId') userId: string){
