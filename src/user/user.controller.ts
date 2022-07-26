@@ -14,9 +14,10 @@ export class UserController {
     constructor(private readonly userService : UserService){}
 
     @Get('/:userId')
-    @ApiOperation({description:"Find a user bi Id"})
+    @ApiOperation({description:"Find a user by Id"})
     async findUserById(@Param('userId') userId: string){
-        return await this.userService.findById(userId)
+        const user = await this.userService.findById(userId)
+        return ZuAppResponse.Ok(user,"200")
     }
 
     @Patch('/:userId')
@@ -24,7 +25,8 @@ export class UserController {
     async updateUserById(
         @Param('userId') userId: string,
         @Body() updateUserDto: UpdateUserDto){
-            return await this.userService.editUserById(updateUserDto, userId)
+            await this.userService.editUserById(updateUserDto, userId)
+            return ZuAppResponse.Ok(updateUserDto.fullName, "User update successful",'200')
     }
 
 }
