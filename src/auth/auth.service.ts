@@ -37,7 +37,8 @@ export class AuthService {
 
   async signup(user: CreateUserDto) {
     const userdata = Object.assign(new User(), user);
-    const newUser = await this.usersRepo.save(userdata).catch((e) => {
+    const newUser = await this.usersRepo.save(userdata).catch(async (e) => {
+      await this.emailVerificationService.resendVerificationLink(user.email);
       throw new BadRequestException(
         ZuAppResponse.BadRequest(
           'Duplicate Values',
@@ -154,34 +155,36 @@ export class AuthService {
     );
 
     //url paths
-    const baseUrl = this.configService.get(configConstant.baseUrl.identityUrl)
-    const notifyUrl = this.configService.get(configConstant.baseUrl.nofication)
+    const baseUrl = this.configService.get(configConstant.baseUrl.identityUrl);
+    const notifyUrl = this.configService.get(configConstant.baseUrl.nofication);
     const resetEndpoint = `${baseUrl}/Auth-Users/AuthController_resetPassword/${resetToken}`;
-    const frontEndBase = this.configService.get(configConstant.baseUrl.identityUrlFE)
-    const resetPage = `${frontEndBase}/password-reset`
-    const emailUrlPath = `${notifyUrl}/email/send-mail`
-
+    const frontEndBase = this.configService.get(
+      configConstant.baseUrl.identityUrlFE,
+    );
+    const resetPage = `${frontEndBase}/password-reset`;
+    const emailUrlPath = `${notifyUrl}/email/send-mail`;
 
     const emailLink = {
       email: user.email,
-      subject: "Password Reset Request",
+      subject: 'Password Reset Request',
       text: `Kindly click the link below to proceed with the password reset 
-            \n ${resetPage}`
-    }
+            \n ${resetPage}`,
+    };
     const p = this.httpService.axiosRef;
     // This sends the reset link to the registered email of the user
     const axiosRes = await p({
       method: 'post',
       url: emailUrlPath,
-      data: emailLink
-    })
-    return resetEndpoint
+      data: emailLink,
+    });
+    return resetEndpoint;
   }
 
-
-  async resetPassword(id: string, token: string, body: PasswordResetDto) 
-  : Promise<User>
-  {
+  async resetPassword(
+    id: string,
+    token: string,
+    body: PasswordResetDto,
+  ): Promise<User> {
     const user: User = await this.usersRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(
@@ -195,25 +198,35 @@ export class AuthService {
     );
     let hashedPassword = `${salt}:${hash}`;
     await this.usersRepo.update(id, { password: hashedPassword });
-    return user
+    return user;
   }
 
-  async changePassword(id: string, dto: ChangePasswordDto ){
+  async changePassword(id: string, dto: ChangePasswordDto) {
     //get current user password hash from database
-    const user = await this.usersRepo.findOne({where:{id: id}})
-    const currentPasswordHash = user.password
+    const user = await this.usersRepo.findOne({ where: { id: id } });
+    const currentPasswordHash = user.password;
     // hash old password from request body
-    const oldPasswordHash = await this.jwtHelperService.hashPassword(dto.oldPassword, user.password.split(':')[0] )
+    const oldPasswordHash = await this.jwtHelperService.hashPassword(
+      dto.oldPassword,
+      user.password.split(':')[0],
+    );
     //compare passwords
-    const isPasswordCorrect = oldPasswordHash == currentPasswordHash
-    if (!isPasswordCorrect){
+    const isPasswordCorrect = oldPasswordHash == currentPasswordHash;
+    if (!isPasswordCorrect) {
       throw new BadRequestException(
-        ZuAppResponse.BadRequest('Access Denied!', 'Your passwords do not match', "401")
+        ZuAppResponse.BadRequest(
+          'Access Denied!',
+          'Your passwords do not match',
+          '401',
+        ),
       );
-    };
+    }
     //hash new password
-    const hashedPassword = await this.jwtHelperService.hashPassword(dto.newPassword, user.password.split(':')[0]);
+    const hashedPassword = await this.jwtHelperService.hashPassword(
+      dto.newPassword,
+      user.password.split(':')[0],
+    );
     //update user password
-    return await this.usersRepo.update(id, {password: hashedPassword});
-  };
+    return await this.usersRepo.update(id, { password: hashedPassword });
+  }
 }
