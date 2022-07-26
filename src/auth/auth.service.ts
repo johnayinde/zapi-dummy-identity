@@ -20,6 +20,7 @@ import { configConstant } from '../common/constants/config.constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmailVerificationService } from '../email-verification/email-verification.service';
+import { ChangePasswordDto } from 'src/user/dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -196,4 +197,23 @@ export class AuthService {
     await this.usersRepo.update(id, { password: hashedPassword });
     return user
   }
+
+  async changePassword(id: string, dto: ChangePasswordDto ){
+    //get current user password hash from database
+    const user = await this.usersRepo.findOne({where:{id: id}})
+    const currentPasswordHash = user.password
+    // hash old password from request body
+    const oldPasswordHash = await this.jwtHelperService.hashPassword(dto.oldPassword, user.password.split(':')[0] )
+    //compare passwords
+    const isPasswordCorrect = oldPasswordHash == currentPasswordHash
+    if (!isPasswordCorrect){
+      throw new BadRequestException(
+        ZuAppResponse.BadRequest('Access Denied!', 'Your passwords do not match', "401")
+      );
+    };
+    //hash new password
+    const hashedPassword = await this.jwtHelperService.hashPassword(dto.newPassword, user.password.split(':')[0]);
+    //update user password
+    return await this.usersRepo.update(id, {password: hashedPassword});
+  };
 }
