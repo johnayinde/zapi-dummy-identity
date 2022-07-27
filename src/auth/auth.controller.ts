@@ -56,14 +56,13 @@ export class AuthController {
     }
 
     @Serialize(UserDto)
-    @Post('/reset/:token')
+    @Post('/reset/:id')
     @ApiOperation({description: 'password reset function'})
     async resetPassword(
         @Param('id', new ParseUUIDPipe()) id: string,
-        @Param('token') token: string,
         @Body() body: PasswordResetDto
     ): Promise<Ok<User>>{
-        const updatedUser =  await this.authService.resetPassword(id, token, body)
+        const updatedUser =  await this.authService.resetPassword(id, body)
         return ZuAppResponse.Ok( updatedUser, 'User password reset successful', '200')
     }  
     

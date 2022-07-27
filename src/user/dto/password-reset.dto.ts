@@ -17,11 +17,4 @@ export class PasswordResetDto {
     )
     password: string
 
-    @IsString()
-    @IsNotEmpty({message: 'kindly confirm password'})
-    @ApiProperty()
-    @MinLength(8)
-    @MaxLength(20)
-    @Match('password')
-    passwordConfirm: string;
 }
