@@ -133,7 +133,7 @@ export class AuthService {
     };
   }
 
-  async forgotPassword(email: string): Promise<string> {
+  async forgotPassword(email: string): Promise<any> {
     const user: User = await this.usersRepo.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException(
@@ -144,24 +144,13 @@ export class AuthService {
         ),
       );
     }
-    const payload = {
-      id: user.id,
-      email: user.email,
-    };
-    const currentPassword = user.password;
-    const resetToken = await this.jwtHelperService.forgotPassword(
-      payload,
-      currentPassword,
-    );
-
+     const id = user.id
     //url paths
-    const baseUrl = this.configService.get(configConstant.baseUrl.identityUrl);
     const notifyUrl = this.configService.get(configConstant.baseUrl.nofication);
-    const resetEndpoint = `${baseUrl}/Auth-Users/AuthController_resetPassword/${resetToken}`;
     const frontEndBase = this.configService.get(
       configConstant.baseUrl.identityUrlFE,
     );
-    const resetPage = `${frontEndBase}/password-reset`;
+    const resetPage = `${frontEndBase}/password-reset/${id}`
     const emailUrlPath = `${notifyUrl}/email/send-mail`;
 
     const emailLink = {
@@ -177,12 +166,10 @@ export class AuthService {
       url: emailUrlPath,
       data: emailLink,
     });
-    return resetEndpoint;
   }
 
   async resetPassword(
     id: string,
-    token: string,
     body: PasswordResetDto,
   ): Promise<User> {
     const user: User = await this.usersRepo.findOne({ where: { id } });
@@ -191,7 +178,6 @@ export class AuthService {
         ZuAppResponse.NotFoundRequest('User does not exist on the server'),
       );
     }
-    await this.jwtHelperService.verifyResetToken(token, user.password);
     let salt = randomBytes(32).toString('hex');
     let hash = pbkdf2Sync(body.password, salt, 1000, 64, 'sha512').toString(
       'hex',
