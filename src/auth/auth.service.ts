@@ -74,7 +74,9 @@ export class AuthService {
       const tokens = await this.getNewRefreshAndAccessTokens(values, user);
 
       // add userInfo to the list of user history and return along in the response
-      await this.usersRepo.update(user.id, { history: [dto.userInfo] });
+      await this.usersRepo.update(user.id, {
+        history: [...user.history, dto.userInfo],
+      });
 
       return ZuAppResponse.Ok<object>(
         {
