@@ -72,6 +72,10 @@ export class AuthService {
           'Incorrect Credentials',
         );
       const tokens = await this.getNewRefreshAndAccessTokens(values, user);
+
+      // add userInfo to the list of user history and return along in the response
+      await this.usersRepo.update(user.id, { history: [dto.userInfo] });
+
       return ZuAppResponse.Ok<object>(
         {
           ...tokens,
@@ -79,6 +83,7 @@ export class AuthService {
           profileId: user.profileID,
           email: user.email,
           fullName: user.fullName,
+          history: user.history,
         },
         'Successfully logged in',
         201,
@@ -144,13 +149,13 @@ export class AuthService {
         ),
       );
     }
-     const id = user.id
+    const id = user.id;
     //url paths
     const notifyUrl = this.configService.get(configConstant.baseUrl.nofication);
     const frontEndBase = this.configService.get(
       configConstant.baseUrl.identityUrlFE,
     );
-    const resetPage = `${frontEndBase}/password-reset/${id}`
+    const resetPage = `${frontEndBase}/password-reset/${id}`;
     const emailUrlPath = `${notifyUrl}/email/send-mail`;
 
     const emailLink = {
@@ -168,10 +173,7 @@ export class AuthService {
     });
   }
 
-  async resetPassword(
-    id: string,
-    body: PasswordResetDto,
-  ): Promise<User> {
+  async resetPassword(id: string, body: PasswordResetDto): Promise<User> {
     const user: User = await this.usersRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(
