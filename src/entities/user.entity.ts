@@ -2,6 +2,7 @@ import { BeforeInsert, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { randomBytes, pbkdf2Sync } from 'crypto';
 import { SharedEntity } from '../common/model/sharedEntity';
+import { UserInfo } from 'src/common/interface/userInfo.interface';
 
 @Entity()
 export class User extends SharedEntity {
@@ -26,6 +27,13 @@ export class User extends SharedEntity {
   @Column({ unique: true, nullable: true })
   @Exclude()
   refreshToken?: string;
+
+  @Column({
+    type: 'jsonb',
+    default: [],
+    nullable: true,
+  })
+  history: UserInfo[];
 
   @BeforeInsert()
   public setPassword() {
