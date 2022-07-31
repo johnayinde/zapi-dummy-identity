@@ -81,6 +81,6 @@ export class UserService {
       );
     }
 
-    return { histories: user.history };
+    return user.history;
   }
 }
