@@ -2,7 +2,7 @@ import { BeforeInsert, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { randomBytes, pbkdf2Sync } from 'crypto';
 import { SharedEntity } from '../common/model/sharedEntity';
-import { UserInfo } from 'src/common/interface/userInfo.interface';
+import { UserInfo } from 'src/user/dto/userInfo.dto';
 
 @Entity()
 export class User extends SharedEntity {

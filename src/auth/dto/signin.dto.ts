@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { UserInfo } from 'src/common/interface/userInfo.interface';
+import { UserInfo } from 'src/user/dto/userInfo.dto';
 
 export class SignInDto {
   @IsString()
