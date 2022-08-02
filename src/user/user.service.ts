@@ -68,4 +68,19 @@ export class UserService {
     const updatedUser = this.usersRepo.save(user);
     return updatedUser;
   }
+
+  async getLoginHistories(id: string) {
+    const user = await this.usersRepo.findOne({ where: { id: id } });
+    if (!user) {
+      throw new NotFoundException(
+        ZuAppResponse.NotFoundRequest(
+          'Internal server error',
+          'user not found',
+          '404',
+        ),
+      );
+    }
+
+    return user.history;
+  }
 }
