@@ -28,6 +28,10 @@ export class User extends SharedEntity {
   @Exclude()
   refreshToken?: string;
 
+  @Column({ unique: true, nullable: true })
+  @Exclude()
+  resetToken?: string;
+
   @Column({
     type: 'jsonb',
     default: [],
