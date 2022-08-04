@@ -192,6 +192,7 @@ export class AuthService {
         ZuAppResponse.BadRequest(
           'Not authorized',
           'Request for another link and try again',
+          '401'
         ),
       );
     }

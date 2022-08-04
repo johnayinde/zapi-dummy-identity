@@ -46,7 +46,11 @@ export class JwtHelperService {
     let user = await this.userRepo.findOne({ where: { id: payload.id } });
     await this.userRepo.update(user.id, { refreshToken }).catch((err) => {
       throw new BadRequestException(
-        ZuAppResponse.BadRequest('user not found', 'This user does not exist'),
+        ZuAppResponse.BadRequest(
+          'user not found',
+          'This user does not exist',
+          '404',
+        ),
       );
     });
     return refreshToken;
@@ -78,6 +82,7 @@ export class JwtHelperService {
         ZuAppResponse.BadRequest(
           'Invalid Refresh Token',
           'Get the correct refresh token and try again',
+          '401',
         ),
       );
     }
