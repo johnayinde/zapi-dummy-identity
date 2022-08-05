@@ -167,6 +167,10 @@ export class AuthService {
             \n ${resetPage}`,
     };
     const p = this.httpService.axiosRef;
+
+    const resetToken = await this.jwtHelperService.resetToken({ id: user.id });
+    await this.usersRepo.update(id, { resetToken });
+
     // This sends the reset link to the registered email of the user
     const axiosRes = await p({
       method: 'post',
@@ -182,12 +186,27 @@ export class AuthService {
         ZuAppResponse.NotFoundRequest('User does not exist on the server'),
       );
     }
+
+    if (!user.resetToken) {
+      throw new NotFoundException(
+        ZuAppResponse.BadRequest(
+          'Not authorized',
+          'Request for another link and try again',
+          '401'
+        ),
+      );
+    }
+    await this.jwtHelperService.verifyResetToken(user.resetToken);
+
     let salt = randomBytes(32).toString('hex');
     let hash = pbkdf2Sync(body.password, salt, 1000, 64, 'sha512').toString(
       'hex',
     );
     let hashedPassword = `${salt}:${hash}`;
-    await this.usersRepo.update(id, { password: hashedPassword });
+    await this.usersRepo.update(id, {
+      password: hashedPassword,
+      resetToken: null,
+    });
     return user;
   }
 
